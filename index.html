@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Weather Dashboard</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--Bootstrap-->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <header class="bg-primary bg-gradient text-light d-flex justify-content-center align-items-center">
+      <h1>Weather Dashboard</h1>
+    </header>
+    <main class="container-fluid col-12bg-light text-dark p-0">
+        <!--Search Div-->
+        <div class="bg-dark text-light  h-100 col-3 p-4 ">
+            <form class="col-12 d-flex flex-column border-light border-bottom"> 
+                <p class='h4'>Search for a City:</p>
+                <input class='form-control' type="text" id='city-input' placeholder="Enter city name"/>
+                <button class="btn btn-warning mt-4 mb-4">Search</button>
+            </form>
+            <div class='col-12'>
+                <button class="btn btn-secondary col-12 mt-4">Austin</button>
+                <button class="btn btn-secondary col-12 mt-4">Chicago</button>
+                <button class="btn btn-secondary col-12 mt-4">Newyork</button>
+                <button class="btn btn-secondary col-12 mt-4">Orlando</button>
+            </div>
+        </div>
+        <!--API Response Data-->
+        <div class='container-fluid col-9'>
+            <!--Current-->
+            <div class="col-12"></div>
+            <!--5 day forcast-->
+            <div class="col-12"></div>
+        </div>
+    </main>
+    <script src="./assets/js/main.js"></script>
+  </body>
+</html>
