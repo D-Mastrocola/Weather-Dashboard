@@ -17,12 +17,22 @@ let iconMap = [
 ];
 
 let day = moment().format("M/DD/YY");
-console.log(day);
+
+
 
 let currentDataEl = $("#current-data");
-let fiveDayEl = $("#five-day");
+let currentMainEl = $("#current-main");
+let currentInfoEl;
+let fiveDayEl = $("#five-day-container");
 
-let getOneCallData = (coord) => {
+let unixToDate = (timestamp) => {
+  //Multiply timestamp by 1000 to make it milliseconds
+  let date = new Date(timestamp*1000);
+  let formattedDate = moment(date.toISOString()).format('M/DD/YY');
+  return formattedDate;
+}
+
+let getOneCallData = (coord, cityName, weatherIcon) => {
   let response = fetch(
     "https://api.openweathermap.org/data/2.5/onecall?lat=" +
       coord.lat +
@@ -36,50 +46,81 @@ let getOneCallData = (coord) => {
     if (response.ok) {
       response.json().then(function (data) {
         console.log(data);
-        let weatherIcon = $("<i>").addClass("wi");
+        //Format current data
+        let title = $("<h2>").addClass("col-12 h2 mb-2").text(cityName);
+        let weatherIconEl = $("<i>")
+          .addClass("col-12 display-1 mx-5 my-4 wi " + weatherIcon)
+          .attr("id", "weather-icon");
+        currentMainEl.append(title, weatherIconEl);
         //Temperature
         let temp = data.current.temp;
-        let tempEl = $("<p>")
-          .attr("id", "temperature")
-          .addClass("fs-4 ms-4")
+        let tempEl = $("<div>")
+          .addClass("col-12 fs-3")
           .html(
-            '<i class="wi wi-thermometer "></i> ' +
+            '<i class="col-1 wi wi-thermometer text-center"></i> ' +
               Math.round(temp) +
-              String.fromCharCode(176) +
-              "F"
+              " <span class='fs-5 text-muted'>feels like " +
+              Math.round(data.current.feels_like) +
+              "</span>"
           );
-        currentDataEl.append(tempEl);
         //Wind
         let wind = data.current.wind_speed;
-        let windEl = $("<p>")
-          .attr("id", "wind-speed")
-          .addClass("fs-4 ms-4")
-          .html('<i class="wi wi-strong-wind "></i> ' + wind + " MPH");
-        currentDataEl.append(windEl);
-        //Humidty
-        let humidity = data.current.humidity;
-        let humidityEl = $("<p>")
-          .attr("id", "humidity")
-          .addClass("ms-4")
-          .text("Humidity: " + humidity + "%");
-        currentDataEl.append(humidityEl);
-        //UV Index
-        let uv = data.current.uvi;
-        let uvEl = $("<p>")
-          .attr("id", "uv")
-          .addClass("ms-4")
+        let windEl = $("<div>")
+          .addClass("col-12 fs-3")
           .html(
-            'UV Index: <span class="bg-success text-light py-1 px-2 ml-2 rounded">' +
+            '<i class="col-1 wi wi-strong-wind text-center"></i> ' +
+              Math.round(wind) +
+              " MPH"
+          );
+        //Humidity
+        let humidity = data.current.humidity;
+        let humidityEl = $("<div>")
+          .addClass("col-12 fs-3")
+          .html('<i class="col-1 wi wi-humidity text-center"></i> ' + humidity);
+        //UV
+        let uv = data.current.uvi;
+        let uvRating;
+        if (uv < 3) uvRating = "success";
+        else if (uv < 7) uvRating = "warning";
+        else uvRating = "danger";
+
+        let uvEl = $("<div>")
+          .addClass("col-12 fs-3")
+          .html(
+            '<i class="col-1 wi wi-barometer text-center"></i><span class="px-2 rounded bg-' +
+              uvRating +
+              '">' +
               uv +
               "</span>"
           );
-        currentDataEl.append(uvEl);
+
+        currentMainEl.append(tempEl, windEl, humidityEl, uvEl);
+
+        //Format daily data
+        for(let i = 1; i <= 5; i++) {
+          let time =  unixToDate(data.daily[i].dt);
+
+          let dayCardEl = $('<div>').addClass('card bg-primary col-2');
+          let cardTitle = $('<h4>').addClass('fs-4 card-header bg-dark').text(time);
+          let cardIcon = $('<i>').addClass('display-4 m-2 wi ' + getIcon(data.daily[i].weather[0].icon))
+          dayCardEl.append(cardTitle, cardIcon);
+
+          fiveDayEl.append(dayCardEl);
+        }
       });
     } else {
       alert("Error: could not retrieve weather data");
     }
   });
 };
+let getIcon = (code) => {
+  for (let i = 0; i < iconMap.length; i++) {
+    if ( code === iconMap[i][0]) {
+      let weatherIcon = iconMap[i][1];
+      return weatherIcon;
+    }
+  }
+}
 
 let getCoord = (city) => {
   fetch(
@@ -92,26 +133,12 @@ let getCoord = (city) => {
     // request was successful
     if (response.ok) {
       response.json().then(function (data) {
-        let weatherIcon;
-        for (let i = 0; i < iconMap.length; i++) {
-          if (data.weather[0].icon === iconMap[i][0]) {
-            weatherIcon = iconMap[i][1];
-            break;
-          }
-        }
+        let weatherIcon = getIcon(data.weather[0].icon);
         console.log(weatherIcon);
         console.log(data);
-        currentDataEl.empty();
         let name = data.name + " " + day;
-        let cityNameEl = $("<h2>")
-          .attr("id", "city")
-          .addClass("d-flex align-items-center")
-          .html(
-            '<i class="wi ' + weatherIcon + ' display-2 mr-2"></i> ' + name
-          );
-        currentDataEl.append(cityNameEl);
 
-        getOneCallData(data.coord);
+        getOneCallData(data.coord, name, weatherIcon);
       });
     } else {
       alert("Error: could not retrieve data");
@@ -119,4 +146,4 @@ let getCoord = (city) => {
   });
 };
 
-getCoord("Cleveland");
+getCoord("North Canton");
