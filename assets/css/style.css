@@ -9,3 +9,6 @@ header {
 main {
     height: calc(100% - 80px);
 }
+#weather-icon {
+    font-size: 7em;
+}
