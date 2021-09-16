@@ -55,18 +55,18 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         //Temperature
         let temp = data.current.temp;
         let tempEl = $("<div>")
-          .addClass("col-12 fs-3")
+          .addClass("col-6 col-lg-12 fs-3")
           .html(
             '<i class="col-1 wi wi-thermometer text-center"></i> ' +
               Math.round(temp) +
-              " <span class='fs-5 text-muted'>feels like " +
+              "&degF <span class='fs-5 text-muted'>feels like " +
               Math.round(data.current.feels_like) +
-              "</span>"
+              "&degF</span>"
           );
         //Wind
         let wind = data.current.wind_speed;
         let windEl = $("<div>")
-          .addClass("col-12 fs-3")
+          .addClass("col-6 col-lg-12 fs-3")
           .html(
             '<i class="col-1 wi wi-strong-wind text-center"></i> ' +
               Math.round(wind) +
@@ -75,7 +75,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         //Humidity
         let humidity = data.current.humidity;
         let humidityEl = $("<div>")
-          .addClass("col-12 fs-3")
+          .addClass("col-6 col-lg-12 fs-3")
           .html('<i class="col-1 wi wi-humidity text-center"></i> ' + humidity);
         //UV
         let uv = data.current.uvi;
@@ -85,7 +85,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         else uvRating = "danger";
 
         let uvEl = $("<div>")
-          .addClass("col-12 fs-3")
+          .addClass("col-6 col-lg-12 fs-3")
           .html(
             '<i class="col-1 wi wi-barometer text-center"></i><span class="px-2 rounded bg-' +
               uvRating +
@@ -102,8 +102,12 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
 
           let dayCardEl = $('<div>').addClass('card bg-primary col-2');
           let cardTitle = $('<h4>').addClass('fs-4 card-header bg-dark').text(time);
-          let cardIcon = $('<i>').addClass('display-4 m-2 wi ' + getIcon(data.daily[i].weather[0].icon))
-          dayCardEl.append(cardTitle, cardIcon);
+          let cardIcon = $('<i>').addClass('display-4 m-2 wi ' + getIcon(data.daily[i].weather[0].icon));
+
+          let cardTempEl = $('<div>').addClass('col-12').html('<i class="col-1 wi wi-thermometer"></i> ' + data.daily[i].temp.day + "&degF");
+          let cardWindEl = $('<div>').addClass('col-12').html('<i class="col-1 wi wi-strong-wind"></i> ' + data.daily[i].wind_speed);
+          let cardHumidityEl = $('<div>').addClass('col-12').html('<i class="col-1 wi wi-humidity"></i> ' + data.daily[i].humidity)
+          dayCardEl.append(cardTitle, cardIcon, cardTempEl, cardWindEl, cardHumidityEl);
 
           fiveDayEl.append(dayCardEl);
         }
