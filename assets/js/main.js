@@ -16,6 +16,8 @@ let iconMap = [
   ["04n", "wi-night-cloudy"],
 ];
 
+let history = [];
+
 let day = moment().format("M/DD/YY");
 
 let currentDataEl = $("#current-data");
@@ -51,7 +53,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         //Format current data
         let title = $("<h2>").addClass("col-12 h2 mb-2").text(cityName);
         let weatherIconEl = $("<i>")
-          .addClass("col-12 display-1 mx-5 my-4 wi " + weatherIcon)
+          .addClass("col-12 display-1 ml-5 my-4 wi " + weatherIcon)
           .attr("id", "weather-icon");
         currentMainEl.append(title, weatherIconEl);
         //Temperature
@@ -103,7 +105,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         for (let i = 1; i <= 5; i++) {
           let time = unixToDate(data.daily[i].dt);
 
-          let dayCardEl = $("<div>").addClass("card bg-primary col-12 col-md-5 col-lg-2 m-4 m-md-2 m-lg-0");
+          let dayCardEl = $("<div>").addClass("card bg-primary col-8 col-md-5 col-lg-2 m-4 m-md-2 m-lg-0");
           let cardTitle = $("<h4>")
             .addClass("fs-4 card-header bg-dark")
             .text(time);
@@ -115,14 +117,14 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
             .addClass("col-12")
             .html(
               '<i class="col-1 wi wi-thermometer"></i> ' +
-                data.daily[i].temp.day +
+                Math.round(data.daily[i].temp.day) +
                 "&degF"
             );
           let cardWindEl = $("<div>")
             .addClass("col-12")
             .html(
               '<i class="col-1 wi wi-strong-wind"></i> ' +
-                data.daily[i].wind_speed
+                Math.round(data.daily[i].wind_speed) + " MPH"
             );
           let cardHumidityEl = $("<div>")
             .addClass("col-12")
@@ -152,7 +154,18 @@ let getIcon = (code) => {
     }
   }
 };
-
+let addToHistory = (city) => {
+  let historyEl = $('#city-history');
+  history.unshift(city);
+  if(history.length > 6) {
+    history.pop();
+  }
+  historyEl.empty();
+  for(let i = 0; i < history.length; i++) {
+    let buttonEl = $('<button>').addClass("btn btn-secondary col-12 mt-4").text(history[i]);
+    historyEl.append(buttonEl);
+  }
+}
 let getCoord = (city) => {
   fetch(
     "https://api.openweathermap.org/data/2.5/weather?q=" +
@@ -170,6 +183,8 @@ let getCoord = (city) => {
         let name = data.name + " " + day;
 
         getOneCallData(data.coord, name, weatherIcon);
+        addToHistory(data.name);
+        console.log(history)
       });
     } else {
       alert("Error: could not retrieve data");
