@@ -1,14 +1,31 @@
-html, body {
-    height: 100vh;
-    width: 100vw;
+html,
+body {
+  height: 100vh;
+  width: 100vw;
 }
 header {
-    z-index: 10;
-    height: 80px;
+  z-index: 10;
+  height: 80px;
 }
 main {
-    height: calc(100% - 80px);
+  height: calc(100% - 80px);
 }
 #weather-icon {
-    font-size: 7em;
+  font-size: 7em;
+}
+#five-day-container {
+    justify-content: space-between;
+}
+@media screen and (max-width: 1000px) {
+  #search-container {
+    width: 100%;
+    height: auto;
+  }
+  #city-history {
+    display: none;
+    
+  }
+  #five-day-container {
+    justify-content: center;
+}
 }
