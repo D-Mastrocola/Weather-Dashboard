@@ -66,7 +66,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         //Temperature
         let temp = data.current.temp;
         let tempEl = $("<div>")
-          .addClass("col-6 col-lg-12 fs-4")
+          .addClass("col-12 fs-4")
           .html(
             '<i class="col-1 wi wi-thermometer text-center"></i> ' +
             Math.round(temp) +
@@ -77,7 +77,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         //Wind
         let wind = data.current.wind_speed;
         let windEl = $("<div>")
-          .addClass("col-6 col-lg-12 fs-4")
+          .addClass("col-12 fs-4")
           .html(
             '<i class="col-1 wi wi-strong-wind text-center"></i> ' +
             Math.round(wind) +
@@ -86,7 +86,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         //Humidity
         let humidity = data.current.humidity;
         let humidityEl = $("<div>")
-          .addClass("col-6 col-lg-12 fs-4")
+          .addClass("col-12 fs-4")
           .html('<i class="col-1 wi wi-humidity text-center"></i> ' + humidity);
         //UV
         let uv = data.current.uvi;
@@ -96,7 +96,7 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
         else uvRating = "danger";
 
         let uvEl = $("<div>")
-          .addClass("col-6 col-lg-12 fs-4")
+          .addClass("col-12 fs-4")
           .html(
             '<i class="col-1 wi wi-barometer text-center"></i><span class="px-2 rounded bg-' +
             uvRating +
