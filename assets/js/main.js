@@ -2,10 +2,15 @@ const apiKey = "789f2c7c553ae281ecf566fcce879323";
 
 let iconMap = [
   ["11d", "wi-thunderstorm"],
+  ["11n", "wi-thunderstorm"],
   ["09d", "wi-showers"],
+  ["09n", "wi-showers"],
   ["10d", "wi-rain"],
+  ["10n", "wi-rain"],
   ["13d", "wi-snow"],
+  ["13n", "wi-snow"],
   ["50d", "wi-dust"],
+  ["50n", "wi-dust"],
   ["01d", "wi-day-sunny"],
   ["01n", "wi-night-clear"],
   ["02d", "wi-day-cloudy"],
@@ -25,6 +30,8 @@ let currentMainEl = $("#current-main");
 let currentInfoEl;
 let fiveDayEl = $("#five-day-container");
 
+let historyEl = $('#city-history');
+
 let unixToDate = (timestamp) => {
   //Multiply timestamp by 1000 to make it milliseconds
   let date = new Date(timestamp * 1000);
@@ -35,12 +42,12 @@ let unixToDate = (timestamp) => {
 let getOneCallData = (coord, cityName, weatherIcon) => {
   let response = fetch(
     "https://api.openweathermap.org/data/2.5/onecall?lat=" +
-      coord.lat +
-      "&lon=" +
-      coord.lon +
-      "&units=imperial" +
-      "&appid=" +
-      apiKey
+    coord.lat +
+    "&lon=" +
+    coord.lon +
+    "&units=imperial" +
+    "&appid=" +
+    apiKey
   ).then((response) => {
     // request was successful
     if (response.ok) {
@@ -62,10 +69,10 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
           .addClass("col-6 col-lg-12 fs-4")
           .html(
             '<i class="col-1 wi wi-thermometer text-center"></i> ' +
-              Math.round(temp) +
-              "&degF <span class='fs-6 text-muted'>feels like " +
-              Math.round(data.current.feels_like) +
-              "&degF</span>"
+            Math.round(temp) +
+            "&degF <span class='fs-6 text-muted'>feels like " +
+            Math.round(data.current.feels_like) +
+            "&degF</span>"
           );
         //Wind
         let wind = data.current.wind_speed;
@@ -73,8 +80,8 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
           .addClass("col-6 col-lg-12 fs-4")
           .html(
             '<i class="col-1 wi wi-strong-wind text-center"></i> ' +
-              Math.round(wind) +
-              " MPH"
+            Math.round(wind) +
+            " MPH"
           );
         //Humidity
         let humidity = data.current.humidity;
@@ -92,12 +99,12 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
           .addClass("col-6 col-lg-12 fs-4")
           .html(
             '<i class="col-1 wi wi-barometer text-center"></i><span class="px-2 rounded bg-' +
-              uvRating +
-              '">' +
-              uv +
-              "</span>"
+            uvRating +
+            '">' +
+            uv +
+            "</span>"
           );
-      
+
         currentMainEl.append(tempEl, windEl, humidityEl, uvEl);
 
 
@@ -117,14 +124,14 @@ let getOneCallData = (coord, cityName, weatherIcon) => {
             .addClass("col-12")
             .html(
               '<i class="col-1 wi wi-thermometer"></i> ' +
-                Math.round(data.daily[i].temp.day) +
-                "&degF"
+              Math.round(data.daily[i].temp.day) +
+              "&degF"
             );
           let cardWindEl = $("<div>")
             .addClass("col-12")
             .html(
               '<i class="col-1 wi wi-strong-wind"></i> ' +
-                Math.round(data.daily[i].wind_speed) + " MPH"
+              Math.round(data.daily[i].wind_speed) + " MPH"
             );
           let cardHumidityEl = $("<div>")
             .addClass("col-12")
@@ -154,47 +161,83 @@ let getIcon = (code) => {
     }
   }
 };
+let loadHistory = () => {
+  if (localStorage.getItem('history')) {
+    history = JSON.parse(localStorage.getItem('history'));
+    getCoord(history[0]);
+    historyEl.empty();
+    for (let i = 0; i < history.length; i++) {
+      let buttonEl = $('<button>').addClass("btn btn-secondary col-12 mt-4").text(history[i]);
+      historyEl.append(buttonEl);
+
+      buttonEl.on('click', () => {
+        let text = $(buttonEl).text().trim();
+        getCoord(text);
+      })
+    }
+
+  } else {
+    getCoord("Cleveland")
+  }
+}
+let saveHistory = () => {
+  localStorage.setItem('history', JSON.stringify(history));
+}
 let addToHistory = (city) => {
-  let historyEl = $('#city-history');
-  history.unshift(city);
-  if(history.length > 6) {
+  let duplicates = false
+  //Check for duplicates 
+  for (let i = 0; i < history.length; i++) {
+    if (city === history[i]) {
+      history.splice(i, 1);
+      history.unshift(city);
+      duplicates = true;
+    }
+  }
+  if (!duplicates) history.unshift(city);
+  if (history.length > 6) {
     history.pop();
   }
   historyEl.empty();
-  for(let i = 0; i < history.length; i++) {
+  for (let i = 0; i < history.length; i++) {
     let buttonEl = $('<button>').addClass("btn btn-secondary col-12 mt-4").text(history[i]);
     historyEl.append(buttonEl);
+
+    buttonEl.on('click', () => {
+      let text = $(buttonEl).text().trim();
+      getCoord(text);
+    })
   }
+  saveHistory();
 }
 let getCoord = (city) => {
   fetch(
     "https://api.openweathermap.org/data/2.5/weather?q=" +
-      city +
-      "&units=imperial" +
-      "&appid=" +
-      apiKey
+    city +
+    "&units=imperial" +
+    "&appid=" +
+    apiKey
   ).then((response) => {
     // request was successful
     if (response.ok) {
       response.json().then(function (data) {
         let weatherIcon = getIcon(data.weather[0].icon);
-        console.log(weatherIcon);
-        console.log(data);
+        //console.log(data);
         let name = data.name + " " + day;
 
         getOneCallData(data.coord, name, weatherIcon);
         addToHistory(data.name);
-        console.log(history)
       });
     } else {
       alert("Error: could not retrieve data");
     }
   });
 };
-getCoord("North Canton");
 
 $("#user-input").on("submit", (event) => {
   event.preventDefault();
   let city = $("#city-input").val().trim();
   getCoord(city);
+  $("#city-input").val('');
 });
+
+loadHistory();
